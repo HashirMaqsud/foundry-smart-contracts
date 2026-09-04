@@ -1,4 +1,5 @@
-export const HAXHIR_TOKEN_ADDRESS = '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9' as const;
+// 1. ERC20 Token Address & ABI
+export const HAXHIR_TOKEN_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3' as const;
 
 export const HAXHIR_TOKEN_ABI = [
   {
@@ -37,6 +38,29 @@ export const HAXHIR_TOKEN_ABI = [
     name: 'transfer',
     outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+] as const;
+
+// 2. ERC721 NFT Address & ABI
+export const HAXHIR_NFT_ADDRESS = '0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512' as const;
+
+export const HAXHIR_NFT_ABI = [
+  {
+    inputs: [
+      { internalType: 'address', name: 'recipient', type: 'address' },
+      { internalType: 'string', name: 'tokenURI', type: 'string' },
+    ],
+    name: 'mintNFT',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'totalMinted',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
     type: 'function',
   },
 ] as const;
