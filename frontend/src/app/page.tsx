@@ -2,8 +2,8 @@
 
 import { useState, useSyncExternalStore } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
-import { parseUnits, formatUnits } from 'viem';
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi';
+import { parseUnits, formatUnits, getAddress } from 'viem';
 import { 
   HAXHIR_TOKEN_ADDRESS, 
   HAXHIR_TOKEN_ABI, 
@@ -17,6 +17,7 @@ const emptySubscribe = () => () => {};
 export default function Home() {
   const isHydrated = useSyncExternalStore(emptySubscribe, () => true, () => false);
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
 
   // Token Transfer States
   const [recipient, setRecipient] = useState('');
@@ -28,68 +29,85 @@ export default function Home() {
   const [nftDescription, setNftDescription] = useState('');
   const [uploadStatus, setUploadStatus] = useState<string>('');
 
-  // --- Read Contract Details ---
+  // Safe Checksummed Contract Addresses
+  const tokenAddress = getAddress(HAXHIR_TOKEN_ADDRESS);
+  const nftAddress = getAddress(HAXHIR_NFT_ADDRESS);
+
+  // --- Read Token Details ---
   const { data: name } = useReadContract({
-    address: HAXHIR_TOKEN_ADDRESS,
+    address: tokenAddress,
     abi: HAXHIR_TOKEN_ABI,
     functionName: 'name',
   });
 
   const { data: symbol } = useReadContract({
-    address: HAXHIR_TOKEN_ADDRESS,
+    address: tokenAddress,
     abi: HAXHIR_TOKEN_ABI,
     functionName: 'symbol',
   });
 
   const { data: decimals } = useReadContract({
-    address: HAXHIR_TOKEN_ADDRESS,
+    address: tokenAddress,
     abi: HAXHIR_TOKEN_ABI,
     functionName: 'decimals',
   });
 
   const { data: balance, refetch: refetchBalance } = useReadContract({
-    address: HAXHIR_TOKEN_ADDRESS,
+    address: tokenAddress,
     abi: HAXHIR_TOKEN_ABI,
     functionName: 'balanceOf',
-    args: address ? [address] : undefined,
+    args: address ? [getAddress(address)] : undefined,
   });
 
+  // --- Read NFT Details ---
   const { data: totalMinted, refetch: refetchNFTs } = useReadContract({
-    address: HAXHIR_NFT_ADDRESS,
+    address: nftAddress,
     abi: HAXHIR_NFT_ABI,
     functionName: 'totalMinted',
   });
 
-  // --- Write Contract: Transfer ---
+  // --- Write: Transfer ---
   const { data: transferHash, isPending: isTransferPending, writeContract: writeTransfer } = useWriteContract();
   const { isLoading: isTransferConfirming, isSuccess: isTransferSuccess } = useWaitForTransactionReceipt({
     hash: transferHash,
   });
 
-  // --- Write Contract: Mint NFT ---
+  // --- Write: Mint NFT ---
   const { data: mintHash, isPending: isMintPending, writeContract: writeMint } = useWriteContract();
   const { isLoading: isMintConfirming, isSuccess: isMintSuccess } = useWaitForTransactionReceipt({
     hash: mintHash,
   });
 
+  const getExplorerUrl = (hash: `0x${string}`) => {
+    if (chainId === 11155111) {
+      return `https://sepolia.etherscan.io/tx/${hash}`;
+    }
+    return null;
+  };
+
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!recipient || !amount || decimals === undefined) return;
 
-    writeTransfer(
-      {
-        address: HAXHIR_TOKEN_ADDRESS,
-        abi: HAXHIR_TOKEN_ABI,
-        functionName: 'transfer',
-        args: [recipient as `0x${string}`, parseUnits(amount, decimals)],
-      },
-      {
-        onSuccess: () => {
-          setAmount('');
-          refetchBalance();
+    try {
+      const validRecipient = getAddress(recipient.trim());
+      writeTransfer(
+        {
+          address: tokenAddress,
+          abi: HAXHIR_TOKEN_ABI,
+          functionName: 'transfer',
+          args: [validRecipient, parseUnits(amount, decimals)],
         },
-      }
-    );
+        {
+          onSuccess: () => {
+            setAmount('');
+            refetchBalance();
+          },
+        }
+      );
+    } catch {
+      alert('Invalid Ethereum recipient address');
+    }
   };
 
   const handleMint = async (e: React.FormEvent) => {
@@ -103,10 +121,10 @@ export default function Home() {
       setUploadStatus('Broadcasting mint transaction to blockchain...');
       writeMint(
         {
-          address: HAXHIR_NFT_ADDRESS,
+          address: nftAddress,
           abi: HAXHIR_NFT_ABI,
           functionName: 'mintNFT',
-          args: [address, tokenURI],
+          args: [getAddress(address), tokenURI],
         },
         {
           onSuccess: () => {
@@ -134,6 +152,7 @@ export default function Home() {
       <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-6">
         <div className="text-center">
           <h1 className="text-2xl font-bold tracking-tight">Haxhir Web3 Portal</h1>
+          <p className="text-xs text-slate-400 mt-1">Foundry + Next.js 15 + Wagmi v2 + Pinata IPFS</p>
         </div>
 
         <div className="flex justify-center">
@@ -185,8 +204,23 @@ export default function Home() {
                 >
                   {isTransferPending ? 'Confirm in Wallet...' : isTransferConfirming ? 'Waiting Block...' : 'Send Tokens'}
                 </button>
-                {isTransferSuccess && (
-                  <span className="text-xs text-center text-emerald-400">Tokens Transferred Successfully!</span>
+
+                {isTransferSuccess && transferHash && (
+                  <div className="text-xs text-center text-emerald-400 mt-1 flex flex-col gap-0.5">
+                    <span>Tokens Transferred Successfully!</span>
+                    {getExplorerUrl(transferHash) ? (
+                      <a 
+                        href={getExplorerUrl(transferHash)!} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-indigo-400 underline hover:text-indigo-300"
+                      >
+                        View on Etherscan ↗
+                      </a>
+                    ) : (
+                      <span className="text-slate-500 font-mono text-[10px]">Tx: {transferHash.slice(0, 10)}...{transferHash.slice(-8)}</span>
+                    )}
+                  </div>
                 )}
               </form>
             </div>
@@ -230,8 +264,23 @@ export default function Home() {
                 >
                   {uploadStatus || (isMintPending ? 'Confirm in Wallet...' : isMintConfirming ? 'Minting on EVM...' : 'Upload to IPFS & Mint NFT')}
                 </button>
-                {isMintSuccess && (
-                  <span className="text-xs text-center text-emerald-400">NFT Minted Successfully! Total Minted updated.</span>
+
+                {isMintSuccess && mintHash && (
+                  <div className="text-xs text-center text-emerald-400 mt-1 flex flex-col gap-0.5">
+                    <span>NFT Minted Successfully! Total Minted updated.</span>
+                    {getExplorerUrl(mintHash) ? (
+                      <a 
+                        href={getExplorerUrl(mintHash)!} 
+                        target="_blank" 
+                        rel="noreferrer" 
+                        className="text-indigo-400 underline hover:text-indigo-300"
+                      >
+                        View on Etherscan ↗
+                      </a>
+                    ) : (
+                      <span className="text-slate-500 font-mono text-[10px]">Tx: {mintHash.slice(0, 10)}...{mintHash.slice(-8)}</span>
+                    )}
+                  </div>
                 )}
               </form>
             </div>
