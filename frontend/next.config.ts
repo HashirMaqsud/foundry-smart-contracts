@@ -1,10 +1,8 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
-  webpack: (config) => {
+const nextConfig = {
+  webpack: (config: any) => {
     config.externals.push(
-      'pino-pretty', 
-      'lokijs', 
+      'pino-pretty',
+      'lokijs',
       'encoding',
       '@x402/evm',
       '@solana/kit',

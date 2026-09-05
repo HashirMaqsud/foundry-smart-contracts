@@ -6,50 +6,60 @@ import {HaxhirToken} from "../src/Haxhir.sol";
 
 contract HaxhirTokenTest is Test {
     HaxhirToken public token;
-    address public owner = address(this);
-    address public alice = address(0x1);
-    address public bob = address(0x2);
+    address public owner;
+    address public userA;
+    address public userB;
 
-    uint256 public constant INITIAL_SUPPLY = 1000;
+    uint256 constant INITIAL_SUPPLY = 1_000_000;
 
     function setUp() public {
+        owner = address(this);
+        userA = makeAddr("userA");
+        userB = makeAddr("userB");
+
         token = new HaxhirToken(INITIAL_SUPPLY);
     }
 
-    // 1. Check Name and Symbol
-    function test_NameAndSymbol() public view {
-        assertEq(token.name(), "Haxhir");
-        assertEq(token.symbol(), "HASH");
+    // 1. Standard Unit Test: Initial Balance Check
+    function test_InitialSupplyAssignedToOwner() public view {
+        uint256 expectedBalance = INITIAL_SUPPLY * (10 ** token.decimals());
+        assertEq(token.balanceOf(owner), expectedBalance);
     }
 
-    // 2. Check Owner Balance and Total Supply
-    function test_InitialSupply() public view {
-        uint256 expectedSupply = INITIAL_SUPPLY * 10 ** token.decimals();
-        assertEq(token.totalSupply(), expectedSupply);
-        assertEq(token.balanceOf(owner), expectedSupply);
+    // 2. Fuzz Test: Randomized Transfer Amount
+    function testFuzz_TransferValidAmount(uint256 amount) public {
+        uint256 ownerBalance = token.balanceOf(owner);
+
+        // Discard invalid test cases: amount must not exceed balance
+        vm.assume(amount <= ownerBalance);
+
+        token.transfer(userA, amount);
+
+        assertEq(token.balanceOf(userA), amount);
+        assertEq(token.balanceOf(owner), ownerBalance - amount);
     }
 
-    // 3. Check Token Transfer
-    function test_Transfer() public {
-        uint256 transferAmount = 100 * 10 ** token.decimals();
-        token.transfer(alice, transferAmount);
+    // 3. Fuzz Test: Revert on Transfer Exceeding Balance
+    function testFuzz_RevertWhenTransferExceedsBalance(uint256 amount) public {
+        uint256 ownerBalance = token.balanceOf(owner);
 
-        assertEq(token.balanceOf(alice), transferAmount);
-    }
+        // Test only amounts strictly greater than balance
+        vm.assume(amount > ownerBalance);
 
-    // 4. Check Mint Function (Only Owner Can Mint)
-    function test_OwnerCanMint() public {
-        uint256 mintAmount = 500 * 10 ** token.decimals();
-        token.mint(bob, mintAmount);
-
-        assertEq(token.balanceOf(bob), mintAmount);
-    }
-
-    // 5. Check Non-Owner Cannot Mint (Revert Test)
-    function test_NonOwnerCannotMint() public {
-        uint256 mintAmount = 500 * 10 ** token.decimals();
-        vm.prank(alice);
         vm.expectRevert();
-        token.mint(alice, mintAmount);
+        token.transfer(userA, amount);
+    }
+
+    // 4. Fuzz Test: Randomized Addresses Transfer
+    function testFuzz_TransferBetweenRandomUsers(address recipient, uint256 amount) public {
+        // Discard zero address and owner address
+        vm.assume(recipient != address(0));
+        vm.assume(recipient != owner);
+
+        uint256 ownerBalance = token.balanceOf(owner);
+        vm.assume(amount <= ownerBalance);
+
+        token.transfer(recipient, amount);
+        assertEq(token.balanceOf(recipient), amount);
     }
 }

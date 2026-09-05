@@ -10,7 +10,6 @@ contract HaxhirToken is ERC20, Ownable {
         _mint(msg.sender, initialSupply * 10 ** decimals());
     }
 
-    // Extra minting sirf contract owner ke liye
     function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount);
     }
