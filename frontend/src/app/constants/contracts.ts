@@ -1,5 +1,5 @@
 // 1. ERC20 Token Address & ABI (Sepolia)
-export const HAXHIR_TOKEN_ADDRESS = '0xc2e4955F5ef720CB8f7c618a8ae401ecde9Fad47' as `0x${string}`;
+export const HAXHIR_TOKEN_ADDRESS = '0xB1f95652B787970acc66952Db344F5b82aA38B15' as `0x${string}`;
 export const HAXHIR_TOKEN_ABI = [
   {
     inputs: [],
@@ -42,7 +42,7 @@ export const HAXHIR_TOKEN_ABI = [
 ] as const;
 
 // 2. ERC721 NFT Address & ABI (Sepolia)
-export const HAXHIR_NFT_ADDRESS = '0x0848681f089a2ebeEFE32f86AF08be14D059e528' as `0x${string}`;
+export const HAXHIR_NFT_ADDRESS = '0x36C5E35dBf75097478A82233a33199C8069Bc1f6' as `0x${string}`;
 export const HAXHIR_NFT_ABI = [
   {
     inputs: [
