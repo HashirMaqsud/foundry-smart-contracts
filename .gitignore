@@ -19,3 +19,7 @@ docs/
 .env.local
 .env.*
 !.env.example
+
+# Python virtual environment for testing
+venv/
+.venv/
