@@ -18,6 +18,9 @@
     "viem": "^2.56.1",
     "wagmi": "^2.19.5"
   },
+  "overrides": {
+    "@paulmillr/qr": "0.1.1"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
