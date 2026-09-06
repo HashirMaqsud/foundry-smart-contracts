@@ -6,9 +6,6 @@ import { injected } from 'wagmi/connectors';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '841954456e7a91cb59147dd04ecc5685';
 
-// ROOT CAUSE FIX: Custom MetaMask Object
-// Yeh function WalletConnect QR fallback ko completely disable kar deta hai.
-// Agar extension nahi hogi, toh yeh crash hone ke bajaye seedha "Install MetaMask" screen dikhayega.
 const safeMetaMaskWallet = (): Wallet => {
   const isMetaMaskInstalled =
     typeof window !== 'undefined' &&
@@ -26,7 +23,7 @@ const safeMetaMaskWallet = (): Wallet => {
       firefox: 'https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/',
       browserExtension: 'https://metamask.io/download/',
     },
-    // Strictly force browser injection. No WalletConnect QR fallback allowed.
+    // @ts-expect-error: Bypassing strict internal type mismatch between wagmi v2 and rainbowkit v2
     createConnector: (walletDetails) => injected({ target: 'metaMask' })(walletDetails),
   };
 };
