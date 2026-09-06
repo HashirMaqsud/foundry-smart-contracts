@@ -1,9 +1,36 @@
-import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+  metaMaskWallet,
+  injectedWallet,
+  coinbaseWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { createConfig, http } from 'wagmi';
 import { sepolia, anvil, mainnet } from 'wagmi/chains';
 
-export const config = getDefaultConfig({
-  appName: 'Haxhir Web3 dApp',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '841954456e7a91cb59147dd04ecc5685',
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Popular',
+      wallets: [
+        injectedWallet,
+        metaMaskWallet,
+        coinbaseWallet,
+      ],
+    },
+  ],
+  {
+    appName: 'Haxhir Web3 dApp',
+    projectId: '841954456e7a91cb59147dd04ecc5685',
+  }
+);
+
+export const config = createConfig({
+  connectors,
   chains: [sepolia, anvil, mainnet],
+  transports: {
+    [sepolia.id]: http(),
+    [anvil.id]: http(),
+    [mainnet.id]: http(),
+  },
   ssr: false,
 });

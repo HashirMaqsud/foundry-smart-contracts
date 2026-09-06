@@ -18,8 +18,6 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
           theme={darkTheme({
             accentColor: '#4f46e5',
             accentColorForeground: 'white',
-            borderRadius: 'medium',
-            overlayBlur: 'small',
           })}
         >
           {children}
