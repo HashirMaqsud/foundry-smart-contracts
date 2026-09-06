@@ -21,7 +21,7 @@ contract SafeBank is ReentrancyGuard {
         balances[msg.sender] = 0;
 
         // 2. INTERACTIONS: External call
-        (bool success, ) = msg.sender.call{value: balance}("");
+        (bool success,) = msg.sender.call{value: balance}("");
         require(success, "Transfer failed");
     }
 

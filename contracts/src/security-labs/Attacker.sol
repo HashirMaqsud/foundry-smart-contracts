@@ -30,7 +30,7 @@ contract Attacker {
     // To withdraw stolen funds
     function drainStolenFunds() external {
         require(msg.sender == owner, "Only owner");
-        (bool success, ) = owner.call{value: address(this).balance}("");
+        (bool success,) = owner.call{value: address(this).balance}("");
         require(success, "Withdraw failed");
     }
 }

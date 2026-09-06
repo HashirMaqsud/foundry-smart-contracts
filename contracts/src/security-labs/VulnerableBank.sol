@@ -16,7 +16,7 @@ contract VulnerableBank {
         require(balance > 0, "No balance to withdraw");
 
         // 1. EXTERNAL INTERACTION (sending ETH first)
-        (bool success, ) = msg.sender.call{value: balance}("");
+        (bool success,) = msg.sender.call{value: balance}("");
         require(success, "Transfer failed");
 
         // 2. EFFECT (Updating state after Interaction — REENTRANCY FLAW!)
