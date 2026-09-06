@@ -4,6 +4,10 @@ A production-grade decentralized application built with Foundry, Next.js 15, Rai
 
 - Live Application: https://foundry-smart-contracts-ten.vercel.app
 - Network: Ethereum Sepolia Testnet
+- **NFT Minting:** Requires Sepolia ETH for gas. Any valid image (`png`, `jpeg`, `webp`, `gif`) will upload to Pinata IPFS and execute on-chain minting.
+- **ERC-20 Token Transfers:** The initial token supply is allocated to the deployer address. To test transfers:
+  1. Mint an NFT directly using your Sepolia wallet.
+  2. For token transfers, contact the deployer address or request testnet `$HASH` tokens: `0x72...53Ae`
 
 ---
 

@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId } from 'wagmi';
-import { parseUnits, formatUnits, getAddress } from 'viem';
+import { parseUnits, formatUnits, getAddress, isAddress, zeroAddress } from 'viem';
 import { 
   HAXHIR_TOKEN_ADDRESS, 
   HAXHIR_TOKEN_ABI, 
@@ -87,16 +87,54 @@ export default function Home() {
 
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!recipient || !amount || decimals === undefined) return;
+
+    const trimmedRecipient = recipient.trim();
+    const parsedAmount = Number(amount);
+
+    // 1. Check if empty
+    if (!trimmedRecipient) {
+      alert('Please provide a recipient address.');
+      return;
+    }
+
+    // 2. Validate Ethereum address format
+    if (!isAddress(trimmedRecipient)) {
+      alert('Invalid Ethereum address format.');
+      return;
+    }
+
+    // 3. Block Zero Address transfer
+    if (trimmedRecipient.toLowerCase() === zeroAddress.toLowerCase()) {
+      alert('Cannot transfer tokens to the zero address (0x00...000).');
+      return;
+    }
+
+    // 4. Validate Amount
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      alert('Transfer amount must be greater than zero.');
+      return;
+    }
+
+    if (decimals === undefined) {
+      alert('Token decimals not loaded yet. Please wait a moment.');
+      return;
+    }
+
+    // 5. Balance pre-flight check
+    const transferAmountUnits = parseUnits(amount, decimals);
+    if (balance !== undefined && (balance as bigint) < transferAmountUnits) {
+      alert('Insufficient token balance for this transfer.');
+      return;
+    }
 
     try {
-      const validRecipient = getAddress(recipient.trim());
+      const validRecipient = getAddress(trimmedRecipient);
       writeTransfer(
         {
           address: tokenAddress,
           abi: HAXHIR_TOKEN_ABI,
           functionName: 'transfer',
-          args: [validRecipient, parseUnits(amount, decimals)],
+          args: [validRecipient, transferAmountUnits],
         },
         {
           onSuccess: () => {
@@ -106,7 +144,7 @@ export default function Home() {
         }
       );
     } catch {
-      alert('Invalid Ethereum recipient address');
+      alert('Transaction execution failed.');
     }
   };
 
@@ -237,7 +275,7 @@ export default function Home() {
               <form onSubmit={handleMint} className="flex flex-col gap-3">
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
                   onChange={(e) => setNftFile(e.target.files?.[0] || null)}
                   className="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700"
                   required
