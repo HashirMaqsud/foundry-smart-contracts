@@ -19,6 +19,10 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
             accentColor: '#4f46e5',
             accentColorForeground: 'white',
           })}
+          appInfo={{
+            appName: 'Haxhir Web3 Portal',
+            learnMoreUrl: 'https://metamask.io',
+          }}
         >
           {children}
         </RainbowKitProvider>

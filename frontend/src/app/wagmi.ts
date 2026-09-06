@@ -2,7 +2,6 @@ import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
   metaMaskWallet,
   coinbaseWallet,
-  injectedWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { createConfig, http } from 'wagmi';
 import { sepolia, anvil, mainnet } from 'wagmi/chains';
@@ -12,9 +11,9 @@ const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '841954456
 const connectors = connectorsForWallets(
   [
     {
-      groupName: 'Recommended Wallets',
+      groupName: 'Popular',
       wallets: [
-        injectedWallet,
+        metaMaskWallet,
         coinbaseWallet,
       ],
     },
