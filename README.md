@@ -55,6 +55,7 @@ Browser Client (Next.js 15 + Wagmi v2 + Viem)
 
 ## Security Auditing & Verification Pipeline
 
+
 Prior to production deployment, all contracts underwent a rigorous 3-tier security validation lifecycle:
 
 ```text
@@ -65,11 +66,16 @@ Prior to production deployment, all contracts underwent a rigorous 3-tier securi
 
 ### 1. Static Analysis (Slither AST Scanning)
 
+![Slither Audit Result](./assets/slither-audit-i.png)
+![Slither Audit Result](./assets/slither-audit-ii.png)
+
 * Scanned contracts using Slither AST analyzers for common vulnerabilities (state variable shadowing, uninitialized state, reentrancy vulnerabilities, arbitrary send).
 * Remediation: Resolved variable shadowing on inherited state variables and enforced strict state ordering across the codebase.
 * **Audit Result:** 0 critical, 0 high, 0 medium findings.
 
 ### 2. Property-Based Fuzz Testing (Foundry)
+
+![Foundry Test Results](./assets/forge-tests.png)
 
 * Tested contract properties and edge cases over **256 randomized runs per function** with boundary condition fuzzing (e.g., 0, 1, 2^256 - 1, randomized recipient addresses).
 * **HaxhirToken Tests:**
