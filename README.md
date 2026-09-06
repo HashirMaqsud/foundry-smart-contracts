@@ -7,6 +7,21 @@ A production-grade decentralized application built with Foundry, Next.js 15, Rai
 
 ---
 
+## Verified Smart Contracts (Ethereum Sepolia Testnet)
+
+All smart contracts have been compiled using Foundry, statically audited with Slither, deployed to the Sepolia testnet, and fully verified on Etherscan and Sourcify.
+
+| Contract | Type | Deployed Address | Network | Explorer Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **HaxhirToken** | ERC-20 | [`0xB1f95652B787970acc66952Db344F5b82aA38B15`](https://sepolia.etherscan.io/address/0xb1f95652b787970acc66952db344f5b82aa38b15#code) | Sepolia | [![Etherscan](https://img.shields.io/badge/Etherscan-Verified%20✅-success?logo=ethereum)](https://sepolia.etherscan.io/address/0xb1f95652b787970acc66952db344f5b82aa38b15#code) |
+| **HaxhirNFT** | ERC-721 | [`0x36C5E35dbF75097478A82233a33199C8069Bc1f6`](https://sepolia.etherscan.io/address/0x36c5e35dbf75097478a82233a33199c8069bc1f6#code) | Sepolia | [![Etherscan](https://img.shields.io/badge/Etherscan-Verified%20✅-success?logo=ethereum)](https://sepolia.etherscan.io/address/0x36c5e35dbf75097478a82233a33199c8069bc1f6#code) |
+
+---
+
+### 🔍 Verification & Interaction Details
+- **Decentralized Verification:** Both contracts are cryptographically verified against their original Solidity source on **Sourcify** and **Sepolia Etherscan**.
+- **Interactive ABI:** You can interact with state methods (minting, balances, token URIs) directly through the **"Read Contract"** and **"Write Contract"** tabs on Etherscan using MetaMask or any Web3 wallet.
+
 ## Architectural Overview
 
 This system operates without a centralized backend server. Client interactions interface directly with on-chain smart contracts through RPC nodes, while digital assets and metadata are preserved using decentralized storage protocols.
