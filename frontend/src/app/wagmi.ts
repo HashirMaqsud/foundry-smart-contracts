@@ -23,7 +23,28 @@ const safeMetaMaskWallet = (): Wallet => {
       firefox: 'https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/',
       browserExtension: 'https://metamask.io/download/',
     },
-    // STRICT FIX: Return the function exactly as Wagmi expects, DO NOT execute it.
+    extension: {
+      instructions: {
+        learnMoreUrl: 'https://metamask.io/',
+        steps: [
+          {
+            description: 'Click below to install the MetaMask extension for your browser.',
+            step: 'install',
+            title: 'Install the MetaMask extension',
+          },
+          {
+            description: 'Be sure to back up your wallet using a secure method.',
+            step: 'create',
+            title: 'Create or Import a Wallet',
+          },
+          {
+            description: 'Once you set up your wallet, click below to refresh the browser.',
+            step: 'refresh',
+            title: 'Refresh your browser',
+          },
+        ],
+      },
+    },
     createConnector: () => injected({ target: 'metaMask' }),
   };
 };
