@@ -23,8 +23,8 @@ const safeMetaMaskWallet = (): Wallet => {
       firefox: 'https://addons.mozilla.org/en-US/firefox/addon/ether-metamask/',
       browserExtension: 'https://metamask.io/download/',
     },
-    // @ts-expect-error: Bypassing strict internal type mismatch between wagmi v2 and rainbowkit v2
-    createConnector: (walletDetails) => injected({ target: 'metaMask' })(walletDetails),
+    // STRICT FIX: Return the function exactly as Wagmi expects, DO NOT execute it.
+    createConnector: () => injected({ target: 'metaMask' }),
   };
 };
 
