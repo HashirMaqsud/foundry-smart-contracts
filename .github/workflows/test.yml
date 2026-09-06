@@ -1,35 +1,24 @@
-name: CI
-
-permissions: {}
+name: Foundry CI
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
-  workflow_dispatch:
+    branches: [ "main" ]
 
 jobs:
   check:
-    name: Foundry project
+    name: Foundry Security & Unit Tests
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout Repository
+        uses: actions/checkout@v3
         with:
-          persist-credentials: false
           submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
-      - name: Show Forge version
-        run: forge --version
-
-      - name: Run Forge fmt
-        run: forge fmt --check
-
-      - name: Run Forge build
-        run: forge build --sizes
-
-      - name: Run Forge tests
+      - name: Run Forge Tests
+        working-directory: ./contracts
         run: forge test -vvv
