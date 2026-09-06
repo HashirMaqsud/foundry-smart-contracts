@@ -6,14 +6,22 @@ import {
 import { createConfig, http } from 'wagmi';
 import { sepolia, anvil, mainnet } from 'wagmi/chains';
 
-const projectId = '841954456e7a91cb59147dd04ecc5685';
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '841954456e7a91cb59147dd04ecc5685';
 
 const safeMetaMaskWallet = (params: any) => {
   const wallet = originalMetaMaskWallet(params);
   
-  // Bugged WalletConnect QR fallback ko forcefully delete kar rahe hain
-  delete wallet.qrCode;
-  delete wallet.mobile;
+  const isMetaMaskInstalled =
+    typeof window !== 'undefined' &&
+    typeof window.ethereum !== 'undefined' &&
+    (window.ethereum as any).isMetaMask === true;
+  
+  wallet.installed = isMetaMaskInstalled;
+  
+  if (!isMetaMaskInstalled) {
+    delete wallet.qrCode;
+    delete wallet.mobile;
+  }
   
   return wallet;
 };
