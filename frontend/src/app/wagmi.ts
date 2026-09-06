@@ -7,17 +7,15 @@ import {
 import { createConfig, http } from 'wagmi';
 import { sepolia, anvil, mainnet } from 'wagmi/chains';
 
-const projectId = '841954456e7a91cb59147dd04ecc5685';
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '841954456e7a91cb59147dd04ecc5685';
 
 const connectors = connectorsForWallets(
   [
     {
-      groupName: 'Recommended',
+      groupName: 'Recommended Wallets',
       wallets: [
-        // useWalletConnectCaller: false QR generator ko trigger hone se rokta hai
-        metaMaskWallet,
-        coinbaseWallet,
         injectedWallet,
+        coinbaseWallet,
       ],
     },
   ],
